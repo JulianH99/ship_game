@@ -5,8 +5,9 @@
 
   state.preload = function() {
     Kiwi.State.prototype.preload.call(this);
-    this.addSpriteSheet('shipSprite', 'images/ship.png', 45, 31);
+    this.addSpriteSheet('shipSprite', 'images/player.PNG', 45, 36);
     this.addSpriteSheet('shoot', 'images/shoot.png', 28, 28);
+    this.addSpriteSheet('enemy', 'images/enemy.png', 45, 62);
     this.addImage('background', 'images/back.jpg');
   };
 
@@ -18,6 +19,7 @@
     this.SHOOT_SPEED = 40;
     this.SHOOT_DELAY = 100;
 
+    // create background
     this.background = new Kiwi.GameObjects.StaticImage(
       this,
       this.textures.background,
@@ -25,6 +27,7 @@
       0
     );
 
+    // create main character
     this.character = new Kiwi.GameObjects.Sprite(
       this,
       this.textures.shipSprite,
@@ -32,6 +35,14 @@
       530
     );
 
+    this.enemy = new Kiwi.GameObjects.Sprite(
+      this,
+      this.textures.enemy,
+      350,
+      70
+    );
+
+    //  create shoots for main character
     this.shoots = new Kiwi.Group(this);
 
     for (let i = 0; i < this.SHOOTS_NUMBER; i++) {
@@ -66,6 +77,7 @@
     this.addChild(this.background);
     this.addChild(this.character);
     this.addChild(this.shoots);
+    this.addChild(this.enemy);
   };
 
   state.getFirstDeadBullet = function() {
@@ -116,7 +128,7 @@
   state.update = function() {
     Kiwi.State.prototype.update.call(this);
 
-    if (this.spaceKey.justPressed()) {
+    if (this.spaceKey.isDown) {
       this.shoot();
     }
 
