@@ -55,7 +55,8 @@
     }
 
     this.upKey = this.game.input.keyboard.addKey(Kiwi.Input.Keycodes.W);
-
+    this.leftKey = this.game.input.keyboard.addKey(Kiwi.Input.Keycodes.A);
+    this.rightKey = this.game.input.keyboard.addKey(Kiwi.Input.Keycodes.D);
     this.downKey = this.game.input.keyboard.addKey(Kiwi.Input.Keycodes.S);
 
     this.spaceKey = this.game.input.keyboard.addKey(
@@ -84,8 +85,6 @@
     this.lastBulletShotAt = this.game.time.now();
 
     var bullet = this.getFirstDeadBullet();
-
-    console.log(this.shoots.members);
 
     // If there aren't any bullets available then don't shoot
     if (bullet === null || bullet === undefined) return;
@@ -120,6 +119,43 @@
     if (this.spaceKey.justPressed()) {
       this.shoot();
     }
+
+    if (this.leftKey.isDown) {
+      this.character.transform.x -= 10;
+      if (this.character.transform.x < 0) {
+        this.character.transform.x = 0;
+      }
+    }
+
+    if (this.rightKey.isDown) {
+      this.character.transform.x += 10;
+      if (
+        this.character.transform.x + this.character.width >
+        this.game.stage.width
+      ) {
+        this.character.transform.x =
+          this.game.stage.width - this.character.width;
+      }
+    }
+
+    if (this.downKey.isDown) {
+      this.character.transform.y += 10;
+      if (
+        this.character.transform.y + this.character.height >
+        this.game.stage.height
+      ) {
+        this.character.transform.y =
+          this.game.stage.height - this.character.height;
+      }
+    }
+
+    if (this.upKey.isDown) {
+      this.character.transform.y -= 10;
+      if (this.character.transform.y < this.game.stage.height / 2) {
+        this.character.transform.y = this.game.stage.height / 2;
+      }
+    }
+
     this.shoots.forEach(this, this.destroyOutsideShoot);
   };
 
