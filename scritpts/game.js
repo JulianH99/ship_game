@@ -15,12 +15,14 @@
     Kiwi.State.prototype.create.call(this);
 
     // asign constants
-    this.SHOOTS_NUMBER = 20;
+    this.SHOOTS_NUMBER = 2;
     this.SHOOT_SPEED = 40;
     this.SHOOT_DELAY = 100;
 
     // enemy constants
     this.ENEMIES_NUMBER = 10;
+    this.ENEMY_SPEED_X = 2;
+    this.ENEMY_SPEED_Y = 5;
 
     // create background
     this.background = new Kiwi.GameObjects.StaticImage(
@@ -76,6 +78,10 @@
       enemy.physics = enemy.components.add(
         new Kiwi.Components.ArcadePhysics(enemy, enemy.box)
       );
+
+      //speed
+      enemy.physics.velocity.y = this.ENEMY_SPEED_Y;
+      enemy.physics.velocity.x = this.ENEMY_SPEED_X;
 
       enemy.alive = true;
     }
@@ -156,6 +162,31 @@
     }
   };
 
+  state.moveEnemy = function(enemy) {
+    if(enemy.transform.x + enemy.width > this.game.stage.width){
+      enemy.transform.x = this.game.stage.width - enemy.width - 1;
+      enemy.physics.velocity.x = -this.ENEMY_SPEED_X;
+    }else if(enemy.transform.x < 0){
+      enemy.transform.x = 0;
+      enemy.physics.velocity.x = this.ENEMY_SPEED_X
+    }
+  }
+
+  state.lose = function(){
+    this.enemies.members.forEach(enemy => {
+      if (enemy.physics.overlaps(this.character)){
+        this.character.destroy()
+        alert('You Lose')
+      }
+    })
+  }
+
+  state.win = function(){
+    if(this.enemies.members.length == 0){
+      alert('you win')
+    }
+  }
+
   state.update = function() {
     Kiwi.State.prototype.update.call(this);
 
@@ -201,6 +232,13 @@
 
     this.shoots.forEach(this, this.destroyOutsideShoot);
     this.checkEnemies();
+
+    this.enemies.members.forEach(enemy => {
+      this.moveEnemy(enemy)
+    })
+
+    this.lose();
+    this.win();
   };
 
   game.states.addState(state);
