@@ -19,6 +19,9 @@
     this.SHOOT_SPEED = 40;
     this.SHOOT_DELAY = 100;
 
+    // enemy constants
+    this.ENEMIES_NUMBER = 10;
+
     // create background
     this.background = new Kiwi.GameObjects.StaticImage(
       this,
@@ -35,15 +38,9 @@
       530
     );
 
-    this.enemy = new Kiwi.GameObjects.Sprite(
-      this,
-      this.textures.enemy,
-      350,
-      70
-    );
-
     //  create shoots for main character
     this.shoots = new Kiwi.Group(this);
+    this.enemies = new Kiwi.Group(this);
 
     for (let i = 0; i < this.SHOOTS_NUMBER; i++) {
       const shoot = new Kiwi.GameObjects.Sprite(
@@ -57,12 +54,30 @@
 
       shoot.anchorPointX = this.character.width * 0.5;
       shoot.anchorPointY = this.character.height * 0.5;
+    
 
       shoot.physics = shoot.components.add(
         new Kiwi.Components.ArcadePhysics(shoot, shoot.box)
       );
 
       shoot.alive = false;
+    }
+
+    for (let i = 0; i < this.ENEMIES_NUMBER; i++) {
+      const enemy = new Kiwi.GameObjects.Sprite(
+        this,
+        this.textures.enemy,
+        10 + 70 * i + 45,
+        50
+      );
+
+      this.enemies.addChild(enemy);
+
+      enemy.physics = enemy.components.add(
+        new Kiwi.Components.ArcadePhysics(enemy, enemy.box)
+      );
+
+      enemy.alive = true;
     }
 
     this.upKey = this.game.input.keyboard.addKey(Kiwi.Input.Keycodes.W);
@@ -77,7 +92,7 @@
     this.addChild(this.background);
     this.addChild(this.character);
     this.addChild(this.shoots);
-    this.addChild(this.enemy);
+    this.addChild(this.enemies);
   };
 
   state.getFirstDeadBullet = function() {
@@ -90,6 +105,22 @@
     }
     return null;
   };
+
+  state.checkEnemies = function() {
+    const shoots = this.shoots.members;
+    const enemies = this.enemies.members;
+
+    for (let i = 0; i < shoots.length; i++) {
+      
+      for(let j = 0; j < enemies.length; j++) {
+        if(shoots[i].physics.overlaps(enemies[j])) {
+          enemies[j].destroy();
+          shoots[i].transform.y = -100;
+          shoots[i].alive = false;
+        }
+      }
+    }
+  }
 
   state.shoot = function() {
     if (this.lastBulletShotAt === undefined) this.lastBulletShotAt = 0;
@@ -169,6 +200,7 @@
     }
 
     this.shoots.forEach(this, this.destroyOutsideShoot);
+    this.checkEnemies();
   };
 
   game.states.addState(state);
