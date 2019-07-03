@@ -19,6 +19,7 @@
     Kiwi.State.prototype.create.call(this);
 
     this.GAME_LOST = false;
+    this.SCORE = 0;
 
     // asign constants
     this.SHOOTS_NUMBER = 20;
@@ -122,11 +123,15 @@
       Kiwi.Input.Keycodes.SPACEBAR
     );
 
+    this.scoreText = new Kiwi.GameObjects.TextField(this, `Score: ${this.SCORE}`,
+      50, 50, '#fff', 30, 'normal',  'Impact'); 
+
     this.addChild(this.background);
     this.addChild(this.character);
     this.addChild(this.shoots);
     this.addChild(this.enemies);
     this.addChild(this.enemyShoots);
+    this.addChild(this.scoreText);
   };
 
   state.getFirstDeadBullet = function() {
@@ -188,6 +193,8 @@
           enemies[j].destroy();
           shoots[i].transform.y = -100;
           shoots[i].alive = false;
+          this.SCORE += 10;
+          this.scoreText.text = `Score: ${this.SCORE}`;
         }
       }
     }
